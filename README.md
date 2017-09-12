@@ -5,12 +5,12 @@ An experimental project containing a banch of various parallelizable algorithms 
 
 ### building
 
-1. install cmake (>= 3.1.0)
+1. `install cmake (>= 3.1.0)`
 
-2. clone repository
+2. `clone repository`
 
-3. cmake .
+3. `cmake .`
 
-4. make
+4. `make`
 
-5. ./parallelizm
+5. `./parallelizm`
