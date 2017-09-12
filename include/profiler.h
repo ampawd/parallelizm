@@ -6,13 +6,13 @@ using namespace std::chrono;
 
 namespace parallelizm 
 {
-	double runtime = 0.0f;
+	static double runtime = 0.0f;
 
-	high_resolution_clock::time_point start, end;
+	static high_resolution_clock::time_point start, end;
 
 
 	template< class Func, class Container, class ResultType >
-	void profile(Func func, Container cont, ResultType res)
+	static void profile(Func func, Container cont, ResultType res)
 	{
 		std::cout << "profiling started ... " << std::endl;
 		
