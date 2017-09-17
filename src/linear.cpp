@@ -43,7 +43,6 @@ namespace parallelizm
 		if (e - chunk_size < v.size())
 		{
 			sum_sequential(v, last_sum, e - chunk_size, v.size());
-			//std::cout << last_sum << '\n';
 		}
 
 		return all_sums + last_sum;
