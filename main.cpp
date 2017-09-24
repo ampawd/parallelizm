@@ -9,24 +9,64 @@
 #include "include/profiler.h"
 
 using parallelizm::profile;
+using parallelizm::Matrix;
+using parallelizm::BlockedMatrix;
+
+
 
 int main()
 {
-	parallelizm::Matrix<int> a({{2, 1, 5, 3}}
-							);
+
+	Matrix<int> a({	{2, 1, 5, 3},
+					{0, 1, 2, -1},
+					{1, 0, -2, 2},
+					{1, 1, 1, 3}}
+				);
 
 
-	parallelizm::Matrix<int> b({{6},
-								{1},
-								{2},
-								{3}} 
-							);
+	Matrix<int> b({	{6, 0, 1, 2},
+					{1, 0, 1, -1},
+					{2, 1, -1, -2},
+					{3, 3, 2, 2}} 
+				);
+
+	//	NxM * MxK = NxK
+	Matrix<int> c(a.rows(), b.cols());
+	
+
+
+	profile([&]() {
+		parallelizm::naive_mult(a, b, c);
+		return c;
+	}, c);
+
+
+	BlockedMatrix<int> a2(2, 2, 2);
+	a2[0][0] = Matrix<int>({{2, 1},	{0, 1}});	
+	a2[0][1] = Matrix<int>({{5, 3}, {2, -1}});
+	a2[1][0] = Matrix<int>({{1, 0}, {1, 1}});
+	a2[1][1] = Matrix<int>({{-2, 2}, {1, 3}});
+
+
+	BlockedMatrix<int> b2(2, 2, 2);
+	b2[0][0] = Matrix<int>({{6, 0},	{1, 0}});	
+	b2[0][1] = Matrix<int>({{1, 2}, {1, -1}});
+	b2[1][0] = Matrix<int>({{2, 1}, {3, 3}});
+	b2[1][1] = Matrix<int>({{-1, -2}, {2, 2}});
 
 
 	//	NxM * MxK = NxK
-	parallelizm::Matrix<int> c(a.rows, b.cols);
-	parallelizm::naive_mult(a, b, c);
-	std::cout << c;
+	BlockedMatrix<int> c2(a2.rows(), b2.cols(), 2);
+
+	parallelizm::simple_blocked_mult(a2, b2, c2);
+	
+	std::cout << c2 << '\n';
+
+
+
+	
+
+
 
 	//	computing max element
 	// std::vector<int> v;// = { 10, 2, 3, 3, 12, -1 };
