@@ -26,7 +26,7 @@ namespace parallelizm
 		
 		Matrix(std::initializer_list< std::initializer_list<T> >&& );
 		
-		void fill(size_t blockSize, const T& value = 0);
+		void fill(size_t fillSize, const T& value = 0);
 		
 		std::vector<T>& operator [] (size_t);
 
@@ -52,18 +52,18 @@ namespace parallelizm
 	}
 
 	template<class T>
-	void Matrix<T>::fill(size_t blockSize, const T& value)
+	void Matrix<T>::fill(size_t fillSize, const T& value)
 	{
-		mat.resize(blockSize);
-		for (int i = 0; i < blockSize; ++i)
+		mat.resize(fillSize);
+		for (int i = 0; i < fillSize; ++i)
 		{
-			mat[i].resize(blockSize);
-			for (int j = 0; j < blockSize; ++j)
+			mat[i].resize(fillSize);
+			for (int j = 0; j < fillSize; ++j)
 			{
 				mat[i][j] = value;
 			}
 		}
-		_rows = _cols = blockSize;
+		_rows = _cols = fillSize;
 	}
 
 
@@ -183,19 +183,23 @@ namespace parallelizm
 		{
 			for (size_t j = 0; j < cols; ++j)
 			{
-				o << m[i][j];
+				std::cout << m[i][j];
+				//for (size_t k = 0, s1 = m[i][j].rows(); k < s1; ++k)
+				//{
+				//	for (size_t l = 0, s2 = m[i][j].cols(); l < s2; ++l)
+				//	{
+				//		o << m[i][j][k][l] << " ";	
+				//	}
+				//}
+				std::cout << '\n';
 			}
 		}
 
 		return o;
 	}
 
-
-
-
-
 	template<class T>
-	void naive_mult(const Matrix<T>& a, const Matrix<T>& b, Matrix<T>& c)
+	void naiveMult(const Matrix<T>& a, const Matrix<T>& b, Matrix<T>& c)
 	{
 		assert(a.cols() == b.rows());
 		size_t n = a.rows(), m = a.cols(), l = b.rows();
@@ -212,8 +216,8 @@ namespace parallelizm
 	}
 
 
-
-	void simple_blocked_mult(const BlockedMatrix<int>& a, const BlockedMatrix<int>& b, BlockedMatrix<int>& c)
+	template<class T>
+	void simpleBlockedMult(const BlockedMatrix<T>& a, const BlockedMatrix<T>& b, BlockedMatrix<T>& c)
 	{
 		assert(a.cols() == b.rows());
 
@@ -224,13 +228,54 @@ namespace parallelizm
 			{
 				for (size_t k = 0; k < l; ++k)
 				{					
-					naive_mult(a[i][k], b[k][j], c[i][j]);
+					naiveMult(a[i][k], b[k][j], c[i][j]);
 				}
-
 			}
 		}
 	}
 	
+	template<class T>
+	void toBlocked(Matrix<T>& m, BlockedMatrix<T>& o) 
+	{	
+		int size = m.rows(), blockSize = o.getBlockSize();
+		int numBlocks = size / blockSize;
+
+		for (int i = 0; i < numBlocks; ++i)
+		{
+			for (int j = 0; j < numBlocks; ++j)
+			{
+				for (int k = 0; k < blockSize; ++k)
+				{
+					for (int l = 0; l < blockSize; ++l)
+					{
+						o[i][j][k][l] = m[i*blockSize + k][j*blockSize + l];
+					}
+				}
+			}
+		}
+	}
+
+	template<class T>
+	void toSimpleMatrix(BlockedMatrix<T>& m, Matrix<T>& o) 
+	{	
+		int size = o.rows(), blockSize = m.getBlockSize();
+		int numBlocks = size / blockSize;
+
+		for (int i = 0; i < numBlocks; ++i)
+		{
+			for (int j = 0; j < numBlocks; ++j)
+			{
+				for (int k = 0; k < blockSize; ++k)
+				{
+					for (int l = 0; l < blockSize; ++l)
+					{
+						o[i*blockSize + k][j*blockSize + l] = m[i][j][k][l];
+					}
+				}
+			}
+		}
+	}
+
 };
 
 #endif
