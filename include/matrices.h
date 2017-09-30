@@ -237,16 +237,17 @@ namespace parallelizm
 	template<class T>
 	void toBlocked(Matrix<T>& m, BlockedMatrix<T>& o) 
 	{	
-		int size = m.rows(), blockSize = o.getBlockSize();
-		int numBlocks = size / blockSize;
+    size_t blockSize = o.getBlockSize(),
+		       numBlocksVert = m.rows() / blockSize, 
+           numBlocksHor = m.cols() / blockSize;
 
-		for (int i = 0; i < numBlocks; ++i)
+		for (size_t i = 0; i < numBlocksVert; ++i)
 		{
-			for (int j = 0; j < numBlocks; ++j)
+			for (size_t j = 0; j < numBlocksHor; ++j)
 			{
-				for (int k = 0; k < blockSize; ++k)
+				for (size_t k = 0; k < blockSize; ++k)
 				{
-					for (int l = 0; l < blockSize; ++l)
+					for (size_t l = 0; l < blockSize; ++l)
 					{
 						o[i][j][k][l] = m[i*blockSize + k][j*blockSize + l];
 					}
@@ -258,16 +259,17 @@ namespace parallelizm
 	template<class T>
 	void toSimpleMatrix(BlockedMatrix<T>& m, Matrix<T>& o) 
 	{	
-		int size = o.rows(), blockSize = m.getBlockSize();
-		int numBlocks = size / blockSize;
+		size_t blockSize = m.getBlockSize(),
+		       numBlocksVert = o.rows() / blockSize,
+           numBlocksHor = o.cols() / blockSize;
 
-		for (int i = 0; i < numBlocks; ++i)
+		for (size_t i = 0; i < numBlocksVert; ++i)
 		{
-			for (int j = 0; j < numBlocks; ++j)
+			for (size_t j = 0; j < numBlocksHor; ++j)
 			{
-				for (int k = 0; k < blockSize; ++k)
+				for (size_t k = 0; k < blockSize; ++k)
 				{
-					for (int l = 0; l < blockSize; ++l)
+					for (size_t l = 0; l < blockSize; ++l)
 					{
 						o[i*blockSize + k][j*blockSize + l] = m[i][j][k][l];
 					}
