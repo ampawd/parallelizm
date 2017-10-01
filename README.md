@@ -1,6 +1,6 @@
 ## Parallelizm
 
-An experimental project containing a banch of various parallelizable algorithms implemented both sequentally and in parallel using C++11 threading and profiling capabilities
+An experimental project containing a banch of various parallelizable algorithms implemented both sequentally and in parallel using C++11 threading capabilities
 
 
 ### building
