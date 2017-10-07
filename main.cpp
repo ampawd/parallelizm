@@ -3,16 +3,14 @@
 #include <vector>
 #include <fstream>
 
-#include "include/simple.h"
+#include "suite/simple.h"
+#include "suite/matrices.h"
+#include "profiler/profiler.h"
 
-#include "include/matrices.h"
-#include "include/profiler.h"
 
 using parallelizm::profile;
 using parallelizm::Matrix;
 using parallelizm::BlockedMatrix;
-
-
 
 
 int main()
@@ -68,16 +66,12 @@ int main()
 	naiveMult(m1, m2, res);
 	std::cout << res;
 
-	//		BlockedMatrix<int> m1b(m1, blockSize);
-	//		BlockedMatrix<int> m2b(m2, blockSize);			
-	//	
-	//		Matrix<int> m1r(m1b);
-	//		std::cout << m1r;	
+	BlockedMatrix<int> m1b(m1, blockSize);
+	BlockedMatrix<int> m2b(m2, blockSize);			
+	BlockedMatrix<int> resb(m1b.rows(), m2b.cols(), blockSize);
 
-	//simpleBlockedMultConcurrent(m1, m2, res);	
-
-
-
+	simpleConcurrentMult(m1b, m2b, resb);	
+	std::cout << resb;
 
 	//  Matrix<int> m1({
 	//      {1, 2, 0, 1,  0, 2, 3, 4,  2, 9, 5, 4},

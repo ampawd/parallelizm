@@ -252,7 +252,7 @@ namespace parallelizm
 		}
 
 	template<class T>
-		void simpleBlockedMult(const BlockedMatrix<T>& a, const BlockedMatrix<T>& b, BlockedMatrix<T>& c)
+		void naiveMult(const BlockedMatrix<T>& a, const BlockedMatrix<T>& b, BlockedMatrix<T>& c)
 		{
 			assert(a.cols() == b.rows());
 
@@ -268,24 +268,39 @@ namespace parallelizm
 				}
 			}
 		}
+		
 
 	template<class T>
-		void simpleBlockedMultConcurrent(const BlockedMatrix<T>& a, const BlockedMatrix<T>& b, BlockedMatrix<T>& c)
+		void simpleConcurrentMult(const BlockedMatrix<T>& a, const BlockedMatrix<T>& b, BlockedMatrix<T>& c)
 		{
 			assert(a.cols() == b.rows());
 
 			size_t n_threads = std::thread::hardware_concurrency();
 			std::vector<std::thread> workers(n_threads);
-		//			
-		//	for (int i = 0; i < n_threads; ++i)
-		//	{
-		//		workers[i] = std::thread();
-		//	}	
-		//	
-		//	for (int i = 0; i < n_threads; ++i)
-		//	{
-		//		workers[i].join();
-		//	}	
+			size_t subRows = a.rows()/n_threads;
+			
+					
+			for (size_t i = 0; i < n_threads; ++i)
+			{
+				workers[i] = std::thread( [&](size_t tid){
+					for (size_t i = tid*subRows; i < (tid + 1)*subRows; i++)
+					{
+						for (size_t j = 0; j < a.cols(); j++)
+						{
+							for (size_t k = 0; k < b.cols(); k++)
+							{
+								naiveMult(a[i][k], b[k][j], c[i][j]);
+							}
+						}						
+					}
+
+				}, i );
+			}	
+			
+			for (int i = 0; i < n_threads; ++i)
+			{
+				workers[i].join();
+			}	
 		}
 
 
