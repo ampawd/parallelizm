@@ -10,14 +10,15 @@ project (parallelizm)
 
 
 # includes
-include_directories (${CMAKE_SOURCE_DIR}/include)
+include_directories (${CMAKE_SOURCE_DIR}/suite)
 
+include_directories (${CMAKE_SOURCE_DIR}/profiler)
 
-set(HEADER_FILES ${CMAKE_SOURCE_DIR}/include/)
+# set(HEADER_FILES ${CMAKE_SOURCE_DIR}/include/)
 
 
 # sources
-file(GLOB SOURCES src/*.cpp)
+file(GLOB SOURCES suite/*.cpp)
 
 # support for threading
 find_package(Threads)
