@@ -41,7 +41,8 @@ namespace parallelizm
 				void initWithZeros(size_t, size_t);
 				std::vector<T>& operator [] (size_t);
 				const std::vector<T>& operator [] (size_t) const;
-				
+				bool operator == (const Matrix&) const;	
+				bool operator != (const Matrix&) const;	
 			template<class U>
 				friend std::ostream& operator << (std::ostream&, const Matrix<U>&);
 				
@@ -90,13 +91,34 @@ namespace parallelizm
 	template<class T>
 		std::vector<T>& Matrix<T>::operator [] (size_t i)
 		{
-			return mat[i];
+			return mat.at(i);
 		}
 
 	template<class T>
 		const std::vector<T>& Matrix<T>::operator [] (size_t i) const
 		{
-			return mat[i];
+			return mat.at(i);
+		}
+
+	template<class T>
+		bool Matrix<T>::operator == (const Matrix& other) const
+		{
+			assert(rows() == other.rows() && cols() == other.cols());
+			for (size_t i = 0; i < rows(); i++)
+			{
+				for (size_t j = 0; j < cols(); j++)
+				{
+					if (other[i][j] != mat[i][j]) return false;
+				}
+			}
+			
+			return true;
+		}
+	
+	template<class T>
+		bool Matrix<T>::operator != (const Matrix& rhs) const
+		{
+			return !(*this == rhs);
 		}
 
 	template<class T>
@@ -238,12 +260,12 @@ namespace parallelizm
 		void naiveMult(const Matrix<T>& a, const Matrix<T>& b, Matrix<T>& c)
 		{
 			assert(a.cols() == b.rows());
-			size_t n = a.rows(), m = a.cols(), l = b.cols();
+			size_t n = a.rows(), m = b.cols(), l = a.cols();
 			for (size_t i = 0; i < n; ++i)
 			{
-				for (size_t j = 0; j < l; ++j)
+				for (size_t j = 0; j < m; ++j)
 				{
-					for (size_t k = 0; k < m; ++k)
+					for (size_t k = 0; k < l; ++k)
 					{
 						c[i][j] += a[i][k]*b[k][j];
 					}
@@ -256,13 +278,13 @@ namespace parallelizm
 		{
 			assert(a.cols() == b.rows());
 
-			size_t n = a.rows(), m = a.cols(), l = b.rows();
+			size_t n = a.rows(), m = b.cols(), l = a.cols();
 			for (size_t i = 0; i < n; ++i)
 			{
 				for (size_t j = 0; j < m; ++j)
 				{
 					for (size_t k = 0; k < l; ++k)
-					{					
+					{
 						naiveMult(a[i][k], b[k][j], c[i][j]);
 					}
 				}
@@ -277,17 +299,19 @@ namespace parallelizm
 
 			size_t n_threads = std::thread::hardware_concurrency();
 			std::vector<std::thread> workers(n_threads);
-			size_t subRows = a.rows()/n_threads;
+			int subRows = a.rows()/n_threads;
+			if (subRows < 1) {
+				n_threads = subRows = 1;
+			}
 			
-					
 			for (size_t i = 0; i < n_threads; ++i)
 			{
-				workers[i] = std::thread( [&](size_t tid){
+				workers[i] = std::thread( [&](size_t tid) {
 					for (size_t i = tid*subRows; i < (tid + 1)*subRows; i++)
 					{
-						for (size_t j = 0; j < a.cols(); j++)
+						for (size_t j = 0; j < b.cols(); j++)
 						{
-							for (size_t k = 0; k < b.cols(); k++)
+							for (size_t k = 0; k < a.cols(); k++)
 							{
 								naiveMult(a[i][k], b[k][j], c[i][j]);
 							}
