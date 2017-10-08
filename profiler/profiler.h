@@ -29,14 +29,22 @@ namespace parallelizm
 	static void profile(Func func, ResultType& res)
 	{
 		std::cout << "profiling started ... " << std::endl;
-		
 		start = high_resolution_clock::now();
 		res = func();
 		end = high_resolution_clock::now();
 		runtime = duration<double>(end - start).count();
-		
 		std::cout << "elapsed time = " << runtime << " sec" << std::endl;
 		std::cout << res << std::endl;
 	}
 
+	template< class Func >
+	static void profile(Func func)
+	{
+		std::cout << "profiling started ... " << std::endl;
+		start = high_resolution_clock::now();
+		func();
+		end = high_resolution_clock::now();
+		runtime = duration<double>(end - start).count();
+		std::cout << "elapsed time = " << runtime << " sec" << std::endl;
+	}
 };
