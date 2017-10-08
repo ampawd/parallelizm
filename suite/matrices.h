@@ -299,13 +299,11 @@ namespace parallelizm
 
 			size_t n_threads = std::thread::hardware_concurrency();
 			std::vector<std::thread> workers(n_threads);
-			int subRows = a.rows()/n_threads;
-			if (subRows < 1) {
-				n_threads = subRows = 1;
-			}
-			
+			size_t subRows = a.rows()/n_threads;
+						
 			for (size_t i = 0; i < n_threads; ++i)
 			{
+
 				workers[i] = std::thread( [&](size_t tid) {
 					for (size_t i = tid*subRows; i < (tid + 1)*subRows; i++)
 					{
@@ -319,9 +317,20 @@ namespace parallelizm
 					}
 
 				}, i );
+			
 			}	
 			
-			for (int i = 0; i < n_threads; ++i)
+			if (a.rows() % n_threads)
+			{
+				for (size_t i = subRows*n_threads; i < a.rows(); i++)
+				{
+					for (size_t j = 0; j < b.cols(); j++)
+						for (size_t k = 0; k < a.cols(); k++)
+							naiveMult(a[i][k], b[k][j], c[i][j]);
+				}
+			}
+			
+			for (size_t i = 0; i < n_threads; ++i)
 			{
 				workers[i].join();
 			}	
