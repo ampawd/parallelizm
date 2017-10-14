@@ -12,10 +12,8 @@ using parallelizm::profile;
 using parallelizm::Matrix;
 using parallelizm::BlockedMatrix;
 
-
 int main()
 {
-
 	//	Matrix<int> m1({
 	//			{1, 2, 0, 1,  0, 2, 3, 4,  2, 9, 5, 4,  1, 1, 2, 2},
 	//			{0, 1, 2, 3,  1, 2, 3, 4,  2, 1, 1, 3,  2, 2, 4, 5},
@@ -60,44 +58,90 @@ int main()
 	//			{2, 3, 9, 3, 2, 3, 4, 3,  0, 9, 0, 2,  1, 8, 4, 1}
 	//			});
 	//	
-	size_t w1 = 256, h1 = 512, w2 = 128, h2 = 256;
-	size_t blockSize = 32;
+	// size_t w1 = 128, h1 = 128, w2 = 128, h2 = 128;
+	// size_t blockSize = 32;
+
+	
+	// Matrix<int> m1(h1, w1);
+	// Matrix<int> m2(h2, w2);
+	// for (int i = 0; i < h1; i++)
+	// {
+	// 	for (int j = 0; j < w1; j++)
+	// 		m1[i][j] = std::rand() % 20;
+	// }			
+
+	// for (int i = 0; i < h2; i++)
+	// {
+	// 	for (int j = 0; j < w2; j++)
+	// 		m2[i][j] = std::rand() % 20;
+	// }
+
+	// Matrix<int> res(m1.rows(), m2.cols());
+	// profile( [&](){
+	// 	naiveMult(m1, m2, res);
+	// } );
+
+	
+
+	// BlockedMatrix<int> m1b(m1, blockSize);
+	// BlockedMatrix<int> m2b(m2, blockSize);			
+	// BlockedMatrix<int> resb(m1b.rows(), m2b.cols(), blockSize);
+	// profile([&](){
+	// 	simpleConcurrentMult(m1b, m2b, resb);	
+	// });
+	// Matrix<int> resFinal(res.rows(), res.cols());
+	// toSimpleMatrix(resb, resFinal);
+	// if (resFinal == res)
+	// {
+	// 	std::cout << "correct" << '\n';
+	// } else {
+	// 	std::cout << "fail" << '\n';
+	// }
 
 
-	Matrix<int> m1(h1, w1);
-	Matrix<int> m2(h2, w2);
-	for (int i = 0; i < h1; i++)
-	{
-		for (int j = 0; j < w1; j++)
-			m1[i][j] = std::rand() % 20;
-	}			
+	Matrix<int> m1({
+		
+		{1, 3, 2, 2},
+		{5, 8, 1, 5},
+		{3, 5, 0, 1},
+		{1, 5, 2, 4}
 
-	for (int i = 0; i < h2; i++)
-	{
-		for (int j = 0; j < w2; j++)
-			m2[i][j] = std::rand() % 20;
-	}
+		// {1, 3, 2, 10, 2, 3},
+		// {5, 8, 1, 11, 1, 3},
+		// {3, 5, 0, 22, 1, 2},
+		// {3, 5, 0, 1,  2, 1},
+		// {4, 7, 2, 1,  3, 0},
+		// {2, 5, 4, 3,  2, 2}
 
-	Matrix<int> res(m1.rows(), m2.cols());
-	profile( [&](){
-		naiveMult(m1, m2, res);
-	} );
+		// {1, 3},
+		// {5, 8}
+		
+		// {1, 2, 0, 1,  0, 2, 3, 4,  2, 9, 5, 4,  1, 1, 2, 2},
+		// {0, 1, 2, 3,  1, 2, 3, 4,  2, 1, 1, 3,  2, 2, 4, 5},
+		// {2, 1, 2, 3,  1, 2, 1, 1,  0, 9, 0, 2,  1, 1, 2, 3},
+		// {2, 1, 2, 1,  1, 2, 3, 4,  2, 1, 1, 3,  2, 2, 4, 5},
 
+		// {9, 1, 2, 2,  1, 2, 1, 1,  0, 9, 0, 2,  1, 1, 2, 3},
+		// {0, 1, 2, 1,  1, 2, 3, 4,  2, 1, 1, 3,  2, 2, 4, 5},
+		// {0, 1, 2, 1,  1, 6, 3, 4,  2, 1, 1, 3,  2, 2, 4, 5},
+		// {9, 1, 2, 4,  1, 3, 1, 1,  0, 9, 0, 2,  1, 1, 2, 3},
 
-	BlockedMatrix<int> m1b(m1, blockSize);
-	BlockedMatrix<int> m2b(m2, blockSize);			
-	BlockedMatrix<int> resb(m1b.rows(), m2b.cols(), blockSize);
-	profile([&](){
-		simpleConcurrentMult(m1b, m2b, resb);	
+		// {9, 1, 2, 3,  1, 2, 1, 1,  0, 9, 0, 2,  1, 1, 2, 3},
+		// {0, 1, 2, 3,  1, 1, 3, 4,  2, 1, 1, 3,  2, 2, 4, 5},
+		// {4, 1, 2, 3,  1, 0, 2, 4,  1, 1, 3, 3,  2, 8, 4, 5},
+		// {2, 1, 2, 3,  1, 2, 3, 4,  5, 1, 1, 3,  2, 2, 4, 5},
+
+		// {9, 1, 3, 3,  3, 0, 1, 1,  8, 9, 0, 2,  1, 1, 2, 3},
+		// {8, 1, 1, 3,  5, 0, 2, 1,  6, 9, 0, 2,  1, 5, 2, 3},
+		// {1, 1, 5, 3,  7, 2, 3, 1,  0, 9, 0, 2,  1, 1, 2, 3},
+		// {2, 1, 9, 3,  2, 3, 4, 1,  0, 9, 0, 2,  1, 1, 2, 3}
 	});
-	Matrix<int> resFinal(res.rows(), res.cols());
-	toSimpleMatrix(resb, resFinal);
-	if (resFinal == res)
-	{
-		std::cout << "correct" << '\n';
-	} else {
-		std::cout << "fail" << '\n';
-	}
+
+	std::cout << m1 << '\n' ;
+	std::cout << m1.det() << '\n'; 
+//	std::cout << m1 << '\n';
+
+
 
 	return 0;
 }
